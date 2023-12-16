@@ -25,12 +25,12 @@ FILE* tmpFile = NULL;
 char tmpFileName[50];
 
 void
-writeToTmpFile()
+writeToFile(FILE* file, char* buffer)
 {
-  fprintf(tmpFile, "%s\n", lineBuffer);
+  fprintf(file, "%s\n", buffer);
 
   // Force flushing the data to the file
-  if (fflush(tmpFile) != 0) {
+  if (fflush(file) != 0) {
     perror("Error flushing file");
   }
 }
@@ -66,7 +66,7 @@ parseLine()
     writeToCurrentDirectory();
   }
 
-  writeToTmpFile();
+  writeToFile(tmpFile, lineBuffer);
 
   return -1;
 }
@@ -92,6 +92,10 @@ generateTempFile()
     strcpy(tmpFileName, filename); 
     // Open the file for writing
     tmpFile = fopen(filename, "w");
+
+    char payload[200]="#include <stdio.h>\nint\nmain(int argc, char** argv)\n{\n";
+    writeToFile(tmpFile, payload);
+    writeToFile(tmpFile, "}");
 
     // Check if the file was opened successfully
     if (tmpFile == NULL) {
